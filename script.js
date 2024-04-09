@@ -1,91 +1,73 @@
-function Gameboard() {
-    const rows = 3;
-    const columns = 3;
-    const board = [];
+const TicTacToeGame = {
+    board: document.querySelector('.board'),
+    currentPlayer: 'X',
+    gameState: ['', '', '', '', '', '', '', '', ''],
+    gameActive: true,
 
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++){
-            board[i].push(Cell());
-        }
-    }
+    handleCellClick: function(event) {
+        const clickedCell = event.target;
+        const cellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
 
-    const getBoard = () => board;
-
-    const markCell = (row, column, player) => {
-        board[row][column].markCell(player);
-    };
-
-    const checkForWinner = (player) => {
-        for (let i = 0; i < rows; i++) {
-            if (board[i][0].getValue() === player &&
-                board[i][1].getValue() === player &&
-                board[i][2].getValue() === player) {
-                return true;
-            }
-        }
-
-        for (let j = 0; j < columns; j++) {
-            if (board[0][j].getValue() === player &&
-                board[1][j].getValue() === player &&
-                board[2][j].getValue() === player) {
-                return true;
-            }
-        }
-
-        if ((board[0][0].getValue() === player &&
-             board[1][1].getValue() === player &&
-             board[2][2].getValue() === player) ||
-            (board[0][2].getValue() === player &&
-             board[1][1].getValue() === player &&
-             board[2][0].getValue() === player)) {
-            return true;
-        }
-
-        return false;
-    };
-
-    return {getBoard, markCell, checkForWinner};
-}
-
-function Cell() {
-    let value = 0;
-    const markCell = (player) => {
-        value = player;
-    }
-
-    const getValue = () => value;
-
-    return {markCell, getValue};
-}
-
-function GameControl(playerOneName = "Player One", playerTwoName = "Player Two") {
-    const board = Gameboard();
-    const players = [{name: playerOneName, mark: 1}, {name: playerTwoName, mark: 2}];
-    let currentPlayer = players[0];
-
-    const switchPlayerTurn = () => {
-        currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-    };
-
-    const createNewRound = () => {
-        console.log(`${currentPlayer.name}'s turn.`);
-    };
-
-    const playTurn = (row, column) => {
-        console.log(`${currentPlayer.name}'s choice is...`);
-        board.markCell(row, column, currentPlayer.mark);
-
-        if (board.checkForWinner(currentPlayer.mark)) {
-            console.log(`${currentPlayer.name} wins!`);
+        if (this.gameState[cellIndex] !== '' || !this.gameActive) {
             return;
-        };
+        }
 
-        switchPlayerTurn();
-        createNewRound();
-    };
+        this.handleCellPlayed(clickedCell, cellIndex);
+        this.handleResultValidation();
+    },
 
-    createNewRound();
+    handleCellPlayed: function(clickedCell, cellIndex) {
+        this.gameState[cellIndex] = this.currentPlayer;
+        clickedCell.textContent = this.currentPlayer;
+    },
 
-    return{playTurn};
-}
+    handleResultValidation: function() {
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        let roundWon = false;
+
+        for (let i = 0; i < winningConditions.length; i++) {
+            const [a, b, c] = winningConditions[i];
+
+            if (this.gameState[a] !== '' && this.gameState[a] === this.gameState[b] && this.gameState[a] === this.gameState[c]) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            alert(`Player ${this.currentPlayer} has won!`);
+            this.gameActive = false;
+            return;
+        }
+
+        if (!this.gameState.includes('')) {
+            alert('The game is a draw!');
+            this.gameActive = false;
+            return;
+        }
+
+        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+    },
+
+    startGame: function() {
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('data-cell-index', i);
+            cell.addEventListener('click', this.handleCellClick.bind(this));
+            this.board.appendChild(cell);
+        }
+    }
+};
+
+TicTacToeGame.startGame();
