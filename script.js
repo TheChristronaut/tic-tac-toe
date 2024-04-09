@@ -4,7 +4,7 @@ const TicTacToeGame = {
     gameState: ['', '', '', '', '', '', '', '', ''],
     gameActive: true,
 
-    handleCellClick: function(event) {
+    handleCellClick(event) {
         const clickedCell = event.target;
         const cellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
 
@@ -16,12 +16,12 @@ const TicTacToeGame = {
         this.handleResultValidation();
     },
 
-    handleCellPlayed: function(clickedCell, cellIndex) {
+    handleCellPlayed(clickedCell, cellIndex) {
         this.gameState[cellIndex] = this.currentPlayer;
         clickedCell.textContent = this.currentPlayer;
     },
 
-    handleResultValidation: function() {
+    handleResultValidation() {
         const winningConditions = [
             [0, 1, 2],
             [3, 4, 5],
@@ -59,7 +59,7 @@ const TicTacToeGame = {
         this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
     },
 
-    startGame: function() {
+    startGame() {
         for (let i = 0; i < 9; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
